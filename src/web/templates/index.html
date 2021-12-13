@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{election}}</title>
+  <base href="/index.html">
+  <meta content="width=device-width, initial-scale = 1.0" name="viewport">
+  <link href="{{ url_for('static',filename='stylesheets/style.css') }}" rel='stylesheet'/>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+<style>
+  {% for c in candidates %}
+  button.{{c.id}} { 
+    background-color: {{c.color}};
+  }
+  button.{{c.id}}:hover, button.{{c.id}}:focus { 
+    background-color: {{c.color}};
+    filter: brightness(60%);
+  }
+  {% endfor %}
+</style>
+<div id="content-container">
+  <div id="content-container-center">
+    <h3>{{election}}!</h3>
+    <form action="/" id="choice" method="POST" name='form'>
+      {% for c in candidates %}
+      <button class="{{c.id}}" id="{{c.id}}" name="vote" type="submit" value="{{c.id}}">{{c.name}}</button>
+      {% endfor %}
+      <fieldset id="voter_info">
+      <label>State</label><select required id="state" name="state" value="{{state}}" onChange="updateCounty()"></select>
+      <label>County</label><select required id="county" name="county" value="{{county}}"></select>
+    </fieldset>
+    </form>
+    <div id="tip">
+      Voter ID: {{voter_id}}<br>
+      (You can change your vote up until the election)
+    </div>
+    {% if vote %}<div>Go to <a href="/tally/candidates">results</a>.</div>{% endif %}
+  </div>
+</div>
+<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script>
+  const state = '{{state}}';
+  const county = '{{county}}';
+</script>
+<script src="{{ url_for('static',filename='js/dropdown.js') }}"></script>
+{% if vote %}
+<script>
+  var vote = "{{vote}}";
+  {% for c in candidates %}
+  if (vote == "{{c.id}}") {
+    $(".{{c.id}}").prop('disabled', true);
+    $(".{{c.id}}").html('{{c.name}} <i class="fa fa-check-circle"></i>');
+  } else {
+    $(".{{c.id}}").css('opacity', '0.5');
+  }
+  {% endfor %}
+</script>
+{% endif %}
+</body>
+</html>
