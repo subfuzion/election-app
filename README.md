@@ -26,6 +26,9 @@ https://cloud.google.com/deploy
 [Cloud Ops]:
 https://cloud.google.com/products/operations
 
+[Cloud Run]:
+https://cloud.google.com/run
+
 [GKE]:
 https://cloud.google.com/kubernetes-engine
 
