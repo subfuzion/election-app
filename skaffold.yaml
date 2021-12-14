@@ -4,12 +4,13 @@ metadata:
   name: election-app
 build:
   artifacts:
-    - image: gcr.io/voting-app/web
+    - image: gcr.io/election-app/web
       context: src/web
       docker:
         dockerfile: Dockerfile
   tagPolicy:
     sha256: {}
+  googleCloudBuild: {}
 deploy:
   kubectl:
     manifests:
