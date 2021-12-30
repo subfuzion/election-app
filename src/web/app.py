@@ -16,7 +16,9 @@ app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-host = os.getenv("HOST", "0.0.0.0")
+# bind to port 8080 on any available container interface
+# Bandit: ignore B104: Test for binding to all interfaces
+host = os.getenv("HOST", "0.0.0.0") # nosec
 port = os.getenv("PORT", "8080")
 hostname = socket.gethostname()
 
