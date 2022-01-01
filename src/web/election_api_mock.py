@@ -1,8 +1,19 @@
 _MOCK_ELECTION_NAME = "Daffy Duck vs Mickey Mouse"
 
-_MOCK_CANDIDATES = {"daffy": {"id": "daffy", "name": "Daffy Duck", "party": "blue", "color": "#1aaaf8"},
-                    "mickey": {"id": "mickey", "name": "Mickey Mouse", "party": "green", "color": "#00cbca"}}
-
+_MOCK_CANDIDATES = {
+    "daffy": {
+        "id": "daffy",
+        "name": "Daffy Duck",
+        "party": "blue",
+        "color": "#1aaaf8"
+    },
+    "mickey": {
+        "id": "mickey",
+        "name": "Mickey Mouse",
+        "party": "green",
+        "color": "#00cbca"
+    }
+}
 """
 votes is a dictionary that maps candidates to their voters, for example:
 {
@@ -72,7 +83,10 @@ def cast_vote(voter, candidate):
 def tally_votes_by_candidate():
     tallies = {}
     for candidate in _VOTES:
-        tallies[candidate] = {"name": candidate, "votes": len(_VOTES[candidate])}
+        tallies[candidate] = {
+            "name": candidate,
+            "votes": len(_VOTES[candidate])
+        }
     return {"candidateTallies": tallies}
 
 

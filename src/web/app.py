@@ -18,7 +18,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 # bind to port 8080 on any available container interface
 # Bandit: ignore B104: Test for binding to all interfaces
-host = os.getenv("HOST", "0.0.0.0") # nosec
+host = os.getenv("HOST", "0.0.0.0")  # nosec
 port = os.getenv("PORT", "8080")
 hostname = socket.gethostname()
 
@@ -48,8 +48,15 @@ def handle_vote():
         party = candidates[vote]["party"]
 
         data = {
-            "voter": {"voter_id": voter_id, "county": county, "state": state},
-            "candidate": {"name": vote, "party": party},
+            "voter": {
+                "voter_id": voter_id,
+                "county": county,
+                "state": state
+            },
+            "candidate": {
+                "name": vote,
+                "party": party
+            },
         }
 
         # TODO: call backend API
@@ -66,8 +73,7 @@ def handle_vote():
             voter_id=voter_id,
             state=state,
             county=county,
-        )
-    )
+        ))
     resp.set_cookie("voter_id", voter_id)
     return resp
 
@@ -75,7 +81,8 @@ def handle_vote():
 @app.route("/tally/candidates", methods=["GET"])
 def handle_results():
     # TODO: call backend API
-    winner, results = process_results(election_service.get_vote_tally_by_candidates())
+    winner, results = process_results(
+        election_service.get_vote_tally_by_candidates())
 
     resp = make_response(
         render_template(
@@ -83,8 +90,7 @@ def handle_results():
             election=election,
             winner=winner,
             results=results,
-        )
-    )
+        ))
     return resp
 
 
@@ -116,7 +122,9 @@ def process_results(tallies):
 
     # Sort results in order of votes, desc
     ordered_tally = {
-        k: v for k, v in sorted(tally.items(), key=lambda item: item[1], reverse=True)
+        k: v
+        for k, v in sorted(
+            tally.items(), key=lambda item: item[1], reverse=True)
     }
 
     # Get highest voted
