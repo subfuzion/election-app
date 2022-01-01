@@ -1,5 +1,5 @@
 import election_api_mock as mock
-"""state_county identifies where a voter is casting their vote"""
+
 _STATE_COUNTY = {
     "California": ["Fresno", "Alameda", "Sacramento"],
     "Arizona": ["La Paz", "Maricopa", "Mohave"],
@@ -7,6 +7,9 @@ _STATE_COUNTY = {
 
 
 def get_state_county():
+    """
+    Returns a dictionary that maps states to counties
+    """
     return _STATE_COUNTY
 
 

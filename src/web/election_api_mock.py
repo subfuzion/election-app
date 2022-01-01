@@ -14,6 +14,8 @@ _MOCK_CANDIDATES = {
         "color": "#00cbca"
     }
 }
+
+_VOTES = {}
 """
 votes is a dictionary that maps candidates to their voters, for example:
 {
@@ -38,7 +40,6 @@ votes is a dictionary that maps candidates to their voters, for example:
   ],
 }
 """
-_VOTES = {}
 
 
 def get_election_name():
@@ -76,9 +77,6 @@ def cast_vote(voter, candidate):
     else:
         _VOTES[name] = [voter]
 
-    print(_VOTES)
-    print(_VOTES)
-
 
 def tally_votes_by_candidate():
     tallies = {}
@@ -91,10 +89,12 @@ def tally_votes_by_candidate():
 
 
 def validate_voter(voter):
+    # TODO: replace assert with validation exception
     assert voter["voter_id"]
     assert voter["county"]
     assert voter["state"]
 
 
 def validate_candidate(candidate):
+    # TODO: replace assert with validation exception
     assert candidate["name"] in get_candidates()
