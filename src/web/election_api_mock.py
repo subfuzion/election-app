@@ -89,12 +89,39 @@ def tally_votes_by_candidate():
 
 
 def validate_voter(voter):
-    # TODO: replace assert with validation exception
-    assert voter["voter_id"]
-    assert voter["county"]
-    assert voter["state"]
+    check_key_value(voter, "voter_id")
+    check_key_value(voter, "county")
+    check_key_value(voter, "state")
 
 
 def validate_candidate(candidate):
-    # TODO: replace assert with validation exception
-    assert candidate["name"] in get_candidates()
+    if candidate["name"] not in get_candidates():
+        raise NotFoundError("candidate", "name", candidate["name"])
+
+
+def check_key_value(data, key):
+    if key not in data:
+        raise KeyError(key)
+    if not data[key]:
+        raise KeyValueError(data, key)
+
+
+class KeyValueError(Exception):
+
+    def __init__(self, data, key):
+        self.data = data
+        self.key = key
+
+    def __str__(self):
+        return f"{self.data}['{self.key}']: missing value"
+
+
+class NotFoundError(Exception):
+
+    def __init__(self, data, key, value):
+        self.data = data
+        self.key = key
+        self.value = value
+
+        def __str__(self):
+            return f"{self.data} {self.key}: {self.value} not found"

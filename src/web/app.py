@@ -51,11 +51,11 @@ def handle_vote():
             "voter": {
                 "voter_id": voter_id,
                 "county": county,
-                "state": state
+                "state": state,
             },
             "candidate": {
                 "name": vote,
-                "party": party
+                "party": party,
             },
         }
 
