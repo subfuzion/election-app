@@ -1,0 +1,12 @@
+---
+apiVersion: monitoring.gke.io/v1alpha1
+kind: PodMonitor
+metadata:
+  name: web-monitor
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: web
+  podMetricsEndpoints:
+    - port: web-port
