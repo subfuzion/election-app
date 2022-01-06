@@ -1,0 +1,32 @@
+{
+  "name": "@subfuzion/vote-api",
+  "version": "2.0.0",
+  "description": "Vote service for Election App",
+  "type": "module",
+  "author": "Tony Pujals <tonypujals@google.com> (https://twitter.com/tonypujals)",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/subfuzion/election-app.git",
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha --ui tdd --bail",
+    "test-postgres": "mocha test/postgres_test.js --ui tdd",
+    "local-docker-test": "docker compose -f docker-compose.test.yml run sut"
+  },
+  "engines": {
+    "node": ">=v16.0.0"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "~1.19.0",
+    "debug": "~4.3.2",
+    "express": "~4.17.1",
+    "morgan": "~1.10.0",
+    "pg": "^8.7.1",
+    "prom-client": "^14.0.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "mocha": "^9.1.0",
+    "nanoid": "^3.1.23"
+  }
+}
