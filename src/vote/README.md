@@ -17,6 +17,7 @@ docker compose up postgres
 Run database tests in another terminal:
 
 ```text
+export PGHOST=localhost
 npm run postgres_test
 ```
 
@@ -45,6 +46,7 @@ docker compose up postgres vote
 Run tests in another terminal:
 
 ```text
+export PGHOST=localhost
 npm run integration_test
 ```
 
@@ -58,6 +60,8 @@ docker compose run integration_test
 
 ## Important notes
 
+### Rebuilding images
+
 When you modify source code, `docker compose` does not automatically
 pick up these changes. You must run:
 
@@ -65,6 +69,14 @@ pick up these changes. You must run:
 docker compose build
 docker compose restart
 ```
+
+### Viewing logs
+
+To view logs in a separate terminal, run:
+
+    $ docker compose logs [service] [-f]
+
+### Clean up
 
 When you're finished testing, ensure you either
 
@@ -79,7 +91,3 @@ or fully clean up by stopping and removing containers and netorks:
 ```text
 docker compose down
 ```
-
-To view logs, run:
-
-    $ docker compose logs [service]
