@@ -103,24 +103,24 @@ export class Vote {
     let errors = [];
 
     if (!this.voter) {
-      errors.push('missing voter');
+      errors.push("missing voter");
     } else {
       if (!this.voter.county) {
-        errors.push('missing voter county');
+        errors.push("missing voter county");
       }
       if (!this.voter.state) {
-        errors.push('missing voter state');
+        errors.push("missing voter state");
       }
     }
 
     if (!this.candidate) {
-      errors.push('missing candidate');
+      errors.push("missing candidate");
     } else {
       if (!this.candidate.name) {
-        errors.push('missing candidate name');
+        errors.push("missing candidate name");
       }
       if (!this.candidate.party) {
-        errors.push('missing candidate party');
+        errors.push("missing candidate party");
       }
     }
 
@@ -170,7 +170,9 @@ export class TallyVotesByCandidateResult {
       try {
         j = JSON.parse(arg);
       } catch (e) {
-        throw new Error(`TallyVotesByCandidateResult.fromJSON: can't parse: ${arg}`);
+        throw new Error(
+          `TallyVotesByCandidateResult.fromJSON: can't parse: ${arg}`
+        );
       }
     }
     try {
@@ -337,7 +339,7 @@ export class TallyVotesByStateResult {
       for (const [name, stateTally] of Object.entries(j.stateTallies)) {
         tally.set(name, stateTally.votes);
       }
-      return tally
+      return tally;
     } catch (e) {
       throw new Error(`TallyByStateResult.fromJSON: ${e.message}`);
     }
@@ -371,25 +373,36 @@ export class TallyCandidateVotesByStateResult {
       try {
         j = JSON.parse(arg);
       } catch (e) {
-        throw new Error(`TallyCandidateVotesByStateResult.fromJSON: can't parse: ${arg}`);
+        throw new Error(
+          `TallyCandidateVotesByStateResult.fromJSON: can't parse: ${arg}`
+        );
       }
     }
     try {
       const tally = new TallyCandidateVotesByStateResult();
-      for (const [state, candidateByStateTally] of Object.entries(j.candidateByStateTallies)) {
-        for (const [name, candidateTally] of Object.entries(candidateByStateTally.candidateTallies)) {
+      for (const [state, candidateByStateTally] of Object.entries(
+        j.candidateByStateTallies
+      )) {
+        for (const [name, candidateTally] of Object.entries(
+          candidateByStateTally.candidateTallies
+        )) {
           tally.set(state, name, candidateTally.votes);
         }
       }
       return tally;
     } catch (e) {
-      throw new Error(`TallyCandidateVotesByStateResult.fromJSON: ${e.message}`);
+      throw new Error(
+        `TallyCandidateVotesByStateResult.fromJSON: ${e.message}`
+      );
     }
   }
 
   set(state, name, votes) {
     if (!this.candidateByStateTallies.has(state)) {
-      this.candidateByStateTallies.set(state, new TallyVotesByCandidateResult());
+      this.candidateByStateTallies.set(
+        state,
+        new TallyVotesByCandidateResult()
+      );
     }
 
     this.candidateByStateTallies.get(state).set(name, votes);

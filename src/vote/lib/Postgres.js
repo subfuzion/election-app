@@ -2,16 +2,16 @@ import pg from "pg";
 import uuid from "./uuid.js";
 import * as voting from "./voting.js";
 
-const {Client, Pool} = pg;
+const { Client, Pool } = pg;
 
-const eventTable = 'events';
+const eventTable = "events";
 
 // https://www.postgresql.org/docs/13/errcodes-appendix.html
-const E_INVALID_CATALOG_NAME = "3D000"
+const E_INVALID_CATALOG_NAME = "3D000";
 
 function log(...v) {
   if (process.env.NODE_ENV === "development") {
-    console.log('[postgres client]', ...v);
+    console.log("[postgres client]", ...v);
   }
 }
 
@@ -44,7 +44,7 @@ export default class Postgres {
    */
   get adminConnectionURL() {
     const c = this.config;
-    const pw = c.password ? ":${c.password}" : ""
+    const pw = c.password ? ":${c.password}" : "";
     return `postgres://${c.user}${pw}@${c.host}:${c.port}/postgres`;
   }
 
@@ -56,7 +56,7 @@ export default class Postgres {
    */
   get connectionURL() {
     const c = this.config;
-    const pw = c.password ? ":${c.password}" : ""
+    const pw = c.password ? ":${c.password}" : "";
     return `postgres://${c.user}${pw}@${c.host}:${c.port}/${c.database}`;
   }
 
@@ -76,7 +76,8 @@ export default class Postgres {
     if (!this._client) {
       checkConfig(this._config);
       this._client = new Pool({
-        connectionString: this.connectionURL, idleTimeoutMillis: this._config.idleTimeoutMillis
+        connectionString: this.connectionURL,
+        idleTimeoutMillis: this._config.idleTimeoutMillis,
       });
     }
     return this._client;
@@ -88,7 +89,11 @@ export default class Postgres {
    */
   static defaults() {
     return {
-      host: 'postgres', port: 5432, database: 'votes', user: 'postgres', idleTimeoutMillis: 5000,
+      host: "postgres",
+      port: 5432,
+      database: "votes",
+      user: "postgres",
+      idleTimeoutMillis: 5000,
     };
   }
 
@@ -109,17 +114,17 @@ export default class Postgres {
     const c = Postgres.defaults();
 
     // TODO: not recommended, use password file (https://www.postgresql.org/docs/14/libpq-pgpass.html)
-    if (process.env.PGPASSWORD) c.password = process.env.PGPASSWORD
-    if (process.env.PGHOST) c.host = process.env.PGHOST
-    if (process.env.PGPORT) c.port = process.env.PGPORT
-    if (process.env.PGDATABASE) c.database = process.env.PGDATABASE
-    if (process.env.PGUSER) c.user = process.env.PGUSER
+    if (process.env.PGPASSWORD) c.password = process.env.PGPASSWORD;
+    if (process.env.PGHOST) c.host = process.env.PGHOST;
+    if (process.env.PGPORT) c.port = process.env.PGPORT;
+    if (process.env.PGDATABASE) c.database = process.env.PGDATABASE;
+    if (process.env.PGUSER) c.user = process.env.PGUSER;
 
     return Object.assign(c, config);
   }
 
   async initDatabase() {
-    log('Initialize database')
+    log("Initialize database");
     const c = this.config;
 
     const adminClient = new Client(this.adminConnectionURL);
@@ -130,7 +135,7 @@ export default class Postgres {
       await adminClient.connect();
       await adminClient.query(`CREATE DATABASE ${c.database};`);
       await adminClient.end();
-      log(`Created database: ${c.database}`)
+      log(`Created database: ${c.database}`);
     } catch (e) {
       log(`Failed to create database: ${c.database}`);
       throw e;
@@ -153,7 +158,7 @@ export default class Postgres {
       throw e;
     }
 
-    log('init database success');
+    log("init database success");
   }
 
   /**
@@ -163,14 +168,14 @@ export default class Postgres {
    */
   async connect() {
     if (this._isConnected) {
-      throw new Error('Already connected');
+      throw new Error("Already connected");
     }
 
     const _connect = async () => {
       await this.client.query(`SELECT NOW()`);
       this._isConnected = true;
-      log('Connected to database')
-    }
+      log("Connected to database");
+    };
 
     try {
       await _connect();
@@ -183,9 +188,9 @@ export default class Postgres {
       await this.initDatabase();
 
       // And try one final connection attempt.
-      log('Attempting connect retry');
+      log("Attempting connect retry");
       await _connect();
-      log('Connected to database')
+      log("Connected to database");
     }
   }
 
@@ -193,9 +198,9 @@ export default class Postgres {
    * Remove all rows from the `events` table.
    */
   async truncateTable() {
-    log('Truncating table');
+    log("Truncating table");
     await this.client.query(`TRUNCATE TABLE ${eventTable}`);
-    log(`Truncated table ${eventTable}`)
+    log(`Truncated table ${eventTable}`);
   }
 
   /**
@@ -204,14 +209,14 @@ export default class Postgres {
    * @return {Promise<void>}
    */
   async dropDatabase() {
-    log('Drop database')
+    log("Drop database");
 
     const client = new Client(this.adminConnectionURL);
     log(`Connect to postgres database: ${this.adminConnectionURL}`);
 
     await client.connect();
     await client.query(`DROP DATABASE ${this.config.database};`);
-    await client.end()
+    await client.end();
     log("Dropped database");
   }
 
@@ -221,13 +226,13 @@ export default class Postgres {
    * @return {Promise<void>}
    */
   async close() {
-    log('Close client');
+    log("Close client");
     if (this._client) {
       try {
         await this._client.end();
-        log('Client closed');
+        log("Client closed");
       } catch (e) {
-        log('Failed to close client');
+        log("Failed to close client");
         throw e;
       } finally {
         this._client = null;
@@ -254,11 +259,14 @@ export default class Postgres {
       vote.voter.voter_id = uuid();
     }
 
-    await this.client.query(`INSERT INTO ${eventTable} (voter_id, county, state, candidate, party)
+    await this.client
+      .query(`INSERT INTO ${eventTable} (voter_id, county, state, candidate, party)
                              VALUES ('${vote.voter.voter_id}', '${vote.voter.county}', '${vote.voter.state}',
                                      '${vote.candidate.name}',
                                      '${vote.voter.party}')`);
-    log(`Inserted ${vote.voter.voter_id}: ${vote.voter.county} - ${vote.voter.state} - ${vote.candidate.name} - ${vote.candidate.party}`)
+    log(
+      `Inserted ${vote.voter.voter_id}: ${vote.voter.county} - ${vote.voter.state} - ${vote.candidate.name} - ${vote.candidate.party}`
+    );
     return vote;
   }
 
@@ -333,42 +341,40 @@ export default class Postgres {
                              GROUP BY state, candidate
                              ORDER BY state, votes DESC`);
 
-    const tally = new voting.TallyCandidateVotesByStateResult()
+    const tally = new voting.TallyCandidateVotesByStateResult();
 
     for (const row of r.rows) {
       const state = row.state;
       const candidate = row.candidate;
-      const votes = parseInt(row.votes, 10)
+      const votes = parseInt(row.votes, 10);
       tally.set(state, candidate, votes);
     }
 
     return tally;
   }
-
-
 }
 
 // validate configs before accepting
 function checkConfig(c) {
   const errors = [];
 
-  if (!c.host) errors.push('missing host');
-  if (!c.port) errors.push('missing port');
-  if (!c.database) errors.push('missing database');
-  if (!c.user) errors.push('missing user');
+  if (!c.host) errors.push("missing host");
+  if (!c.port) errors.push("missing port");
+  if (!c.database) errors.push("missing database");
+  if (!c.user) errors.push("missing user");
   // NOTE: no check for missing password because postgres might be running with POSTGRES_HOST_AUTH_METHOD=trust
   // if (!c.password) errors.push('missing password');
 
   if (c.database) {
     const name = c.database;
-    if (name.length > 31 || name.replace(/[a-z0-9_]/g, '').length > 0) {
+    if (name.length > 31 || name.replace(/[a-z0-9_]/g, "").length > 0) {
       errors.push(`not a valid database name: ${c.database}`);
     }
   }
 
   if (errors.length) {
     // don't forget to update test if the following error string is updated!
-    throw new Error(`Invalid config: ${errors.join(', ')}`);
+    throw new Error(`Invalid config: ${errors.join(", ")}`);
   }
 }
 
@@ -377,13 +383,13 @@ function checkVote(vote) {
   let errors = [];
 
   if (!vote) {
-    errors.push('missing vote');
+    errors.push("missing vote");
   } else {
     errors = vote.validate();
   }
 
   if (errors.length) {
     // don't forget to update tests if updating the error message.
-    throw new Error(`Invalid vote: ${errors.join(', ')}`);
+    throw new Error(`Invalid vote: ${errors.join(", ")}`);
   }
 }
