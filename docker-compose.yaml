@@ -23,22 +23,23 @@ services:
         condition: service_healthy
 
   vote:
-    build: ./src/vote
-    image: vote
+    build: .
+    image: ./src/vote
     environment:
       NODE_ENV: development
-      PORT: 3000
+      # If you change PORT, make sure to change `ports` and `healthcheck`!
+      PORT: 8081
       # Read PGUSER password from shell environment
       # NOTE: If postgres not started with POSTGRES_HOST_AUTH_METHOD=trust, then set PGPASSWORD in shell and uncomment.
       #  - PGPASSWORD
     networks:
-      - api_net
       - data_net
     ports:
-      - "3000:3000"
+      # If you change ports, make sure to change `PORT` and healthcheck test!
+      - "8081:8081"
     healthcheck:
-      # Change port in curl command if container environment variable (PORT) sets a different port number.
-      test: test `curl -I -s -o /dev/null -w '%{http_code}' localhost:3000` = 200
+      # If you change `PORT` and `ports`, make sure to change the port for the test!
+      test: test `curl -I -s -o /dev/null -w '%{http_code}' localhost:8081` = 200
       interval: 5s
       timeout: 1s
       retries: 3
@@ -48,28 +49,34 @@ services:
 
   postgres:
     build:
-      context: ./src/database/postgres
+      context: ./src/vote/postgres
       network: host
     networks:
       - data_net
     ports:
       - "5432:5432"
     environment:
-      # WARNING! For local development and CI testing only (otherwise, must set POSTGRES_PASSWORD).
+      # WARNING! Use `trust` for local development and CI testing only
+      # Otherwise, POSTGRES_PASSWORD must be set.
       POSTGRES_HOST_AUTH_METHOD: trust
       PGUSER: postgres
       PGDATABASE: votes
-    # Purpose of this healthcheck is to test that POSTGRES_PASSWORD is
-    # is set and that `psql` can connect to postgres database. Unless this
-    # healthcheck passes, docker compose will pause at the
-    # `database-postgres-1 Started` and never progress to `Running`.
-    # docker compose -f docker-compose.postgres.test.yml ps -> indicates
-    # that container exited (1).
-    # docker compose -f docker-compose.postgres.test.yml logs postgres ->
-    # indicates the error.
-    # For local dev testing (which is the only reason for using docker
-    # compose), the following settings are adequate.
     healthcheck:
+      # Purpose of this healthcheck is to test
+      # - POSTGRES_PASSWORD is set or POSTGRES_HOST_AUTH_METHOD=trust
+      # - `psql` can connect to the postgres database
+      #
+      # Unless this healthcheck passes, docker compose will pause at
+      # `database-postgres-1 Started` and never progress to `Running`.
+      #
+      # docker compose -f docker-compose.postgres.test.yml ps
+      # - shows container exited (1).
+      #
+      # docker compose -f docker-compose.postgres.test.yml logs postgres
+      # - shows the specific error.
+      #
+      # For local dev testing (which is the only reason for using docker
+      # compose), the following settings should be adequate.
       test: [ "CMD", "/usr/local/bin/docker-healthcheck" ]
       interval: 1s
       timeout: 1s
