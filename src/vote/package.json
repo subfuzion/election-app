@@ -9,8 +9,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "mocha --ui tdd --bail",
-    "test-postgres": "mocha test/postgres_test.js --ui tdd",
-    "local-docker-test": "docker compose -f docker-compose.test.yml run sut"
+    "postgres_test": "mocha test/postgres_test.js --ui tdd --bail",
+    "integration_test": "mocha test/integration_test.js --ui tdd --bail"
   },
   "engines": {
     "node": ">=v16.0.0"

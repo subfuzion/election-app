@@ -1,0 +1,88 @@
+version: '2.4'
+
+networks:
+  data_net:
+    driver: bridge
+
+services:
+
+  vote:
+    build: .
+    image: vote
+    environment:
+      NODE_ENV: development
+      # If you change PORT, make sure to change `ports` and `healthcheck`!
+      PORT: 8080
+      # Read PGUSER password from shell environment
+      # NOTE: If postgres not started with POSTGRES_HOST_AUTH_METHOD=trust, then set PGPASSWORD in shell and uncomment.
+      #  - PGPASSWORD
+    networks:
+      - data_net
+    ports:
+      # If you change ports, make sure to change `PORT` and healthcheck test!
+      - "8080:8080"
+    healthcheck:
+      # If you change `PORT` and `ports`, make sure to change the port for the test!
+      test: test `curl -I -s -o /dev/null -w '%{http_code}' localhost:8080` = 200
+      interval: 5s
+      timeout: 1s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    build:
+      context: ./postgres
+      network: host
+    networks:
+      - data_net
+    ports:
+      - "5432:5432"
+    environment:
+      # WARNING! Use `trust` for local development and CI testing only
+      # Otherwise, POSTGRES_PASSWORD must be set.
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGUSER: postgres
+      PGDATABASE: votes
+    healthcheck:
+      # Purpose of this healthcheck is to test
+      # - POSTGRES_PASSWORD is set or POSTGRES_HOST_AUTH_METHOD=trust
+      # - `psql` can connect to the postgres database
+      #
+      # Unless this healthcheck passes, docker compose will pause at
+      # `database-postgres-1 Started` and never progress to `Running`.
+      #
+      # docker compose -f docker-compose.postgres.test.yml ps
+      # - shows container exited (1).
+      #
+      # docker compose -f docker-compose.postgres.test.yml logs postgres
+      # - shows the specific error.
+      #
+      # For local dev testing (which is the only reason for using docker
+      # compose), the following settings should be adequate.
+      test: [ "CMD", "/usr/local/bin/docker-healthcheck" ]
+      interval: 1s
+      timeout: 1s
+      retries: 1
+
+  postgres_test:
+    build: .
+    entrypoint: npm run postgres_test
+    networks:
+      - data_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  integration_test:
+    image: vote
+    entrypoint: npm run integration_test
+    networks:
+      - data_net
+    environment:
+      VOTE_HOST: vote
+      VOTE_PORT: 8080
+    depends_on:
+      vote:
+        condition: service_healthy

@@ -44,7 +44,8 @@ export default class Postgres {
    */
   get adminConnectionURL() {
     const c = this.config;
-    return `postgres://${c.user}:${c.password}@${c.host}:${c.port}/postgres`;
+    const pw = c.password ? ":${c.password}" : ""
+    return `postgres://${c.user}${pw}@${c.host}:${c.port}/postgres`;
   }
 
   /**
@@ -55,7 +56,8 @@ export default class Postgres {
    */
   get connectionURL() {
     const c = this.config;
-    return `postgres://${c.user}:${c.password}@${c.host}:${c.port}/${c.database}`;
+    const pw = c.password ? ":${c.password}" : ""
+    return `postgres://${c.user}${pw}@${c.host}:${c.port}/${c.database}`;
   }
 
   /**
