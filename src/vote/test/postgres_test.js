@@ -10,7 +10,7 @@ import {
   TallyVotesByStateResult,
   Vote,
   Voter,
-} from "../lib/voting.js";
+} from "../lib/vote_types.js";
 
 const TEST_TIMEOUT = 1000 * 15;
 
