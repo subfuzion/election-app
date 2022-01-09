@@ -4,7 +4,7 @@ import metrics from "prom-client";
 import morgan from "morgan";
 
 import Postgres from "./lib/Postgres.js";
-import * as voting from "./lib/voting.js";
+import * as voting from "./lib/vote_types.js";
 
 // Enable default prometheus-compatible metrics collection
 const register = metrics.register;

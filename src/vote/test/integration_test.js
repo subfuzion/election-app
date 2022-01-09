@@ -1,7 +1,7 @@
 import assert from "assert";
 import axios from "axios";
 
-import * as voting from "../lib/voting.js";
+import * as voting from "../lib/vote_types.js";
 
 const host = process.env.VOTE_HOST || "vote";
 const port = process.env.VOTE_PORT || 8080;

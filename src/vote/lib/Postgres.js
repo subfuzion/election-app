@@ -1,6 +1,6 @@
 import pg from "pg";
 import uuid from "./uuid.js";
-import * as voting from "./voting.js";
+import * as voting from "./vote_types.js";
 
 const { Client, Pool } = pg;
 
