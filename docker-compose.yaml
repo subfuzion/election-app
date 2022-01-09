@@ -23,8 +23,8 @@ services:
         condition: service_healthy
 
   vote:
-    build: .
-    image: ./src/vote
+    build: ./src/vote
+    image: vote
     environment:
       NODE_ENV: development
       # If you change PORT, make sure to change `ports` and `healthcheck`!
