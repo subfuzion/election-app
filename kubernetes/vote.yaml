@@ -2,29 +2,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name: vote
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web
+      app: vote
   template:
     metadata:
       labels:
-        app: web
+        app: vote
     spec:
       serviceAccountName: default
       containers:
-        - name: web
-          image: gcr.io/election-app/web
+        - name: vote
+          image: gcr.io/voting-app/vote
           ports:
             - containerPort: 8080
-              name: web-port
+              name: vote-port
           env:
             - name: PORT
               value: "8080"
-            - name: VOTE
-              value: http://vote:8080
           resources:
             requests:
               cpu: 50m
@@ -36,25 +34,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: web
+  name: vote
 spec:
   type: ClusterIP
   selector:
-    app: web
+    app: vote
   ports:
     - name: http
       port: 8080
-      targetPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: web-external
-spec:
-  type: LoadBalancer
-  selector:
-    app: web
-  ports:
-    - name: http
-      port: 80
       targetPort: 8080

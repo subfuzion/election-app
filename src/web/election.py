@@ -1,6 +1,9 @@
 import requests
 
-_STATE_COUNTY = {"California": ["Fresno", "Alameda", "Sacramento"], "Arizona": ["La Paz", "Maricopa", "Mohave"], }
+_STATE_COUNTY = {
+    "California": ["Fresno", "Alameda", "Sacramento"],
+    "Arizona": ["La Paz", "Maricopa", "Mohave"],
+}
 
 _MOCK_ELECTION_NAME = "Daffy Duck vs Mickey Mouse"
 
@@ -45,10 +48,11 @@ class Election:
         return _STATE_COUNTY
 
     def cast_vote(self, voter, candidate):
-        return requests.post(self.api + "/vote", json={
-            "voter": voter,
-            "candidate": candidate
-        })
+        return requests.post(self.api + "/vote",
+                             json={
+                                 "voter": voter,
+                                 "candidate": candidate
+                             })
 
     def get_vote_tally_by_candidates(self):
         return requests.get(self.api + "/tally/candidates")

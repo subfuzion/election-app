@@ -17,6 +17,13 @@ spec:
           image: postgres:13.0
           ports:
             - containerPort: 5432
+          env:
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust
+            - name: PGUSER
+              value: postgres
+            - name: PGDATABASE
+              value: votes
           resources:
             requests:
               cpu: 100m
