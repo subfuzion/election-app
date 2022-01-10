@@ -123,5 +123,5 @@ class NotFoundError(Exception):
         self.key = key
         self.value = value
 
-        def __str__(self):
-            return f"{self.data} {self.key}: {self.value} not found"
+    def __str__(self):
+        return f"{self.data} {self.key}: {self.value} not found"
