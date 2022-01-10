@@ -1,39 +1,30 @@
-import election_api_mock as mock
-
-_STATE_COUNTY = {
-    "California": ["Fresno", "Alameda", "Sacramento"],
-    "Arizona": ["La Paz", "Maricopa", "Mohave"],
-}
-
-
-def get_state_county():
-    """
-    Returns a dictionary that maps states to counties
-    """
-    return _STATE_COUNTY
+import election_api as api
 
 
 class Election:
     """
-    Election provides data in a format to be used for rendering the UI
+    Election is a thin wrapper over the election service api that renders data
+    in a format to be used for rendering the UI.
     """
 
-    def __init__(self):
-        """
-        Instance uses mock values
-        """
-        self.name = mock.get_election_name()
-        self.candidates = mock.get_candidates()
-        self.api = mock
+    def __init__(self, api_url):
+        self.api = api
+        self.api_url = api_url
 
     def get_election_name(self):
-        return self.name
+        return self.api.get_election_name()
 
     def get_candidates(self):
-        return self.candidates
+        return self.api.get_candidates()
 
     def cast_vote(self, voter, candidate):
-        self.api.cast_vote(voter, candidate)
+        return self.api.cast_vote(voter, candidate)
 
     def get_vote_tally_by_candidates(self):
         return self.api.tally_votes_by_candidate()
+
+    def get_state_county(self):
+        """
+        Returns a dictionary that maps states to counties
+        """
+        return self.api.get_state_county()

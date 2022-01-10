@@ -41,16 +41,18 @@ Success:
 ```json
 {
     "success": true,
-    "data": /* returns submitted body with a value for `voter_id` */
+    "data": {}
 }
 ```
+
+`data`: the original request body plus the generated value for `voter_id`
 
 Error:
 
 ```json
 {
     "success": false,
-    "reason": string
+    "reason": ""
 }
 ```
 

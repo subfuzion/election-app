@@ -9,8 +9,9 @@ import sys
 from flask import Flask, render_template, request, make_response
 from paste.translogger import TransLogger
 from prometheus_flask_exporter import PrometheusMetrics
-from election import Election, get_state_county
 from waitress import serve
+
+from election import Election
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
@@ -20,14 +21,14 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 # Bandit: ignore B104: Test for binding to all interfaces
 host = os.getenv("HOST", "0.0.0.0")  # nosec
 port = os.getenv("PORT", "8080")
+api = os.getenv("VOTE", "http://vote")
 hostname = socket.gethostname()
 
 # data for rendering UI
-# TODO API Driven
-election_service = Election()
+election_service = Election(api)
 election = election_service.get_election_name()
 candidates = election_service.get_candidates()
-state_county = get_state_county()
+state_county = election_service.get_state_county()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -47,21 +48,19 @@ def handle_vote():
 
         party = candidates[vote]["party"]
 
-        data = {
-            "voter": {
-                "voter_id": voter_id,
-                "county": county,
-                "state": state,
-            },
-            "candidate": {
-                "name": vote,
-                "party": party,
-            },
+        voter = {
+            "voter_id": voter_id,
+            "county": county,
+            "state": state,
+        }
+        candidate = {
+            "name": vote,
+            "party": party,
         }
 
-        # TODO: call backend API
-        app.logger.info(f"submit vote: {data}")
-        election_service.cast_vote(data["voter"], data["candidate"])
+        app.logger.info(f"submit vote: {{voter: voter, candidate: candidate}}")
+        r = election_service.cast_vote(voter, candidate)
+        app.logger.info(f"vote api: status code: {r.status_code}")
 
     resp = make_response(
         render_template(
@@ -80,9 +79,7 @@ def handle_vote():
 
 @app.route("/tally/candidates", methods=["GET"])
 def handle_results():
-    # TODO: call backend API
-    winner, results = process_results(
-        election_service.get_vote_tally_by_candidates())
+    winner, results = process_results(election_service.get_vote_tally_by_candidates())
 
     resp = make_response(
         render_template(
