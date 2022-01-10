@@ -13,7 +13,7 @@ services:
     image: web
     environment:
       PORT: 8080
-      VOTE: http://vote:3000
+      VOTE: http://vote:8081
     networks:
       - api_net
     ports:
@@ -33,6 +33,7 @@ services:
       # NOTE: If postgres not started with POSTGRES_HOST_AUTH_METHOD=trust, then set PGPASSWORD in shell and uncomment.
       #  - PGPASSWORD
     networks:
+      - api_net
       - data_net
     ports:
       # If you change ports, make sure to change `PORT` and healthcheck test!

@@ -17,14 +17,14 @@ app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-# bind to port 8080 on any available container interface
-# Bandit: ignore B104: Test for binding to all interfaces
+# Bind to port on any available container interface.
+# Bandit: ignore B104: Test for binding to all interfaces.
 host = os.getenv("HOST", "0.0.0.0")  # nosec
 port = os.getenv("PORT", "8080")
 api = os.getenv("VOTE", "http://vote")
 hostname = socket.gethostname()
 
-# data for rendering UI
+# Data for rendering UI.
 election_service = Election(api)
 election = election_service.get_election_name()
 candidates = election_service.get_candidates()
@@ -57,8 +57,12 @@ def handle_vote():
             "name": vote,
             "party": party,
         }
+        data = {
+            "voter": voter,
+            "candidate": candidate,
+        }
 
-        app.logger.info(f"submit vote: {{voter: voter, candidate: candidate}}")
+        app.logger.info(f"submit vote: {data}")
         r = election_service.cast_vote(voter, candidate)
         app.logger.info(f"vote api: status code: {r.status_code}")
 
@@ -79,7 +83,8 @@ def handle_vote():
 
 @app.route("/tally/candidates", methods=["GET"])
 def handle_results():
-    winner, results = process_results(election_service.get_vote_tally_by_candidates())
+    r = election_service.get_vote_tally_by_candidates()
+    winner, results = process_results(r.json()["results"])
 
     resp = make_response(
         render_template(
@@ -110,40 +115,40 @@ def process_results(tallies):
     # }
     tally = {}
 
-    # Flatten results of tallies for candidates
+    # Flatten results of tallies for candidates.
     for key in tallies["candidateTallies"]:
         tally[key] = tallies["candidateTallies"][key]["votes"]
 
     if len(tally) == 0:
         return "No winner yet", {}
 
-    # Sort results in order of votes, desc
+    # Sort results in order of votes, desc.
     ordered_tally = {
         k: v
         for k, v in sorted(
             tally.items(), key=lambda item: item[1], reverse=True)
     }
 
-    # Get highest voted
+    # Get highest voted.
     winner = max(tally, key=tally.get)
     winner_name = candidates[winner]["name"]
     return winner_name, ordered_tally
 
 
-# Powers State dropdown
 @app.route("/data/state/", methods=["GET"])
 def get_states():
+    """Powers State dropdown"""
     return make_response(json.dumps(list(state_county.keys())))
 
 
-# Powers County dropdown
 @app.route("/data/state/<state>", methods=["GET"])
 def get_counties(state):
+    """Powers County dropdown"""
     return make_response(json.dumps(state_county[state]))
 
 
-# Ensures timely exit when running in a container
 def handle_signal(sig, frame):
+    """Ensures timely exit when running in a container"""
     sigmap = {signal.SIGTERM: "SIGTERM", signal.SIGINT: "SIGINT"}
     if sig in [signal.SIGTERM, signal.SIGINT]:
         print(f"Received signal {sigmap[sig]}, exiting.")

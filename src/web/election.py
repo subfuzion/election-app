@@ -1,30 +1,54 @@
-import election_api as api
+import requests
+
+_STATE_COUNTY = {"California": ["Fresno", "Alameda", "Sacramento"], "Arizona": ["La Paz", "Maricopa", "Mohave"], }
+
+_MOCK_ELECTION_NAME = "Daffy Duck vs Mickey Mouse"
+
+_MOCK_CANDIDATES = {
+    "daffy": {
+        "id": "daffy",
+        "name": "Daffy Duck",
+        "party": "blue",
+        "color": "#1aaaf8"
+    },
+    "mickey": {
+        "id": "mickey",
+        "name": "Mickey Mouse",
+        "party": "green",
+        "color": "#00cbca"
+    }
+}
 
 
 class Election:
     """
-    Election is a thin wrapper over the election service api that renders data
-    in a format to be used for rendering the UI.
+    Election is an election service api client and renders data (as needed)
+    for the UI.
     """
 
-    def __init__(self, api_url):
+    def __init__(self, api):
         self.api = api
-        self.api_url = api_url
 
     def get_election_name(self):
-        return self.api.get_election_name()
+        # TODO: get from API
+        return _MOCK_ELECTION_NAME
 
     def get_candidates(self):
-        return self.api.get_candidates()
-
-    def cast_vote(self, voter, candidate):
-        return self.api.cast_vote(voter, candidate)
-
-    def get_vote_tally_by_candidates(self):
-        return self.api.tally_votes_by_candidate()
+        # TODO: get from API
+        return _MOCK_CANDIDATES
 
     def get_state_county(self):
         """
         Returns a dictionary that maps states to counties
         """
-        return self.api.get_state_county()
+        # TODO: get from API
+        return _STATE_COUNTY
+
+    def cast_vote(self, voter, candidate):
+        return requests.post(self.api + "/vote", json={
+            "voter": voter,
+            "candidate": candidate
+        })
+
+    def get_vote_tally_by_candidates(self):
+        return requests.get(self.api + "/tally/candidates")
