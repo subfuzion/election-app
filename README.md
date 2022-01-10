@@ -1,7 +1,7 @@
 # Election App
 
-[![Video walkthrough](https://img.youtube.com/vi/XAkGju1h_Ac/0.jpg)](https://www.youtube.com/watch?v=XAkGju1h_Ac)  
-*Video walkthrough on YouTube*
+[![Video walkthrough](https://img.youtube.com/vi/XAkGju1h_Ac/0.jpg)](https://www.youtube.com/watch?v=XAkGju1h_Ac)
+_Video walkthrough on YouTube_
 
 This repo contains a demo Election App. The purpose of this repo is to
 highlight how to:
@@ -13,27 +13,17 @@ highlight how to:
   - Build and deploy to [GKE] and [Cloud Run] using [Cloud Build].
   - Monitor your deployment, view application logs, and use the IDE to stop on breakpoints in the editor to debug your running app.
 
+# Simplified web app version
 
-
+If you want to use the simplied single service web app with in-memory database,
+checkout the `demo/v1` branch.
 
 <!-- links -->
-[Cloud Build]:
-https://cloud.google.com/build
 
-[Cloud Code]:
-https://cloud.google.com/code
-
-[Cloud Deploy]:
-https://cloud.google.com/deploy
-
-[Cloud Ops]:
-https://cloud.google.com/products/operations
-
-[Cloud Run]:
-https://cloud.google.com/run
-
-[GKE]:
-https://cloud.google.com/kubernetes-engine
-
-[Google Cloud]:
-https://cloud.google.com
+[cloud build]: https://cloud.google.com/build
+[cloud code]: https://cloud.google.com/code
+[cloud deploy]: https://cloud.google.com/deploy
+[cloud ops]: https://cloud.google.com/products/operations
+[cloud run]: https://cloud.google.com/run
+[gke]: https://cloud.google.com/kubernetes-engine
+[google cloud]: https://cloud.google.com
