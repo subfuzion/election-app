@@ -1,5 +1,2 @@
-flask
-paste
-prometheus-flask-exporter
-requests
-waitress
+pglet~=0.5.8
+requests~=2.27.1
