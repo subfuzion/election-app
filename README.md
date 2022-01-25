@@ -14,7 +14,7 @@ highlight how to:
   - Build and deploy to [GKE] and [Cloud Run] using [Cloud Build].
   - Monitor your deployment, view application logs, and use the IDE to stop on breakpoints in the editor to debug your running app.
 
-# Simplified web app version
+## Simplified web app version
 
 If you want to use the simplied single service web app with in-memory database,
 checkout the `demo/v1` branch.
