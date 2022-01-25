@@ -1,7 +1,8 @@
 # Election App
 
 [![Video walkthrough](https://img.youtube.com/vi/XAkGju1h_Ac/0.jpg)](https://www.youtube.com/watch?v=XAkGju1h_Ac)
-_Video walkthrough on YouTube_
+
+*Video walkthrough on YouTube*
 
 This repo contains a demo Election App. The purpose of this repo is to
 highlight how to:
