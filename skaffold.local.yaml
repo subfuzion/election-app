@@ -1,0 +1,21 @@
+apiVersion: skaffold/v2beta25
+kind: Config
+metadata:
+  name: election-app
+build:
+  artifacts:
+  - image: gcr.io/election-app/web
+    context: src/web
+    docker:
+      dockerfile: Dockerfile
+  - image: gcr.io/voting-app/vote
+    context: src/vote
+    docker: {}
+  tagPolicy:
+    sha256: {}
+deploy:
+  kubectl:
+    manifests:
+    - kubernetes/postgres.yaml
+    - kubernetes/vote.yaml
+    - kubernetes/web.yaml

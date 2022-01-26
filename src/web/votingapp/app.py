@@ -11,6 +11,8 @@ class ElectionApp(App):
         self.title = "Voting App Demo"
         self._config = Config()
 
+        print('app init')
+
         # App model
         vote = Vote(self.config)
 

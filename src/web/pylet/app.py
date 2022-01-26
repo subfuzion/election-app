@@ -49,7 +49,7 @@ class App:
     def run(name, target, **kwargs):
         kwargs["target"] = target
         if "server" not in kwargs:
-            kwargs["server"] = "http://localhost:8080"
+            kwargs["server"] = "http://localhost:8888"
         if "no_window" not in kwargs:
             kwargs["no_window"] = True
 

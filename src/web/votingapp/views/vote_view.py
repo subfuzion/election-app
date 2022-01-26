@@ -6,43 +6,58 @@ from pylet import View
 
 
 class VoteView(View):
+    @property
+    def current_voter_id(self):
+        return self._current_voter_id
+
+    @property
+    def current_state(self):
+        return self._current_state
+
+    @property
+    def current_county(self):
+        return self._current_county
+
+    @property
+    def current_candidate(self):
+        return self._current_candidate
+
     def __init__(self, election_name="", candidates=None, state_county=None, on_submit=None):
         super().__init__()
         self.text = "Vote"
         self.icon = "Edit"
 
-        self.on_submit = on_submit
-
+        # View context
         self.election_name = election_name
         self.candidates = candidates
         self.state_county = state_county
+        self.on_submit = on_submit
 
-        # current voter state
-        self.voter_id = hex(random.getrandbits(64))[2:-1]
-        self.current_state = ""
-        self.current_county = ""
+        # Current view state
+        self._current_voter_id = hex(random.getrandbits(64))[2:-1]
+        self._current_state = ""
+        self._current_county = ""
+        self._current_candidate = ""
 
-        # current candidate state
-        self.current_candidate = ""
+        # Controls
+        self._election_name_control = pglet.Text(self.election_name, size="xlarge")
+        self._candidates_choicegroup_control = self._build_candidate_choicegroup()
+        self._vote_button_control = self._build_vote_button()
+        self._voter_control = self._build_voter_control()
+        self._message_control = pglet.Message(visible=False)
 
-        # controls
-        self.election_name_control = pglet.Text(self.election_name, size="xlarge")
-        self.candidates_control = self._candidate_choicegroup()
-        self.vote_control = self._vote_button()
-        self.voter_control = self._voter_control()
-        self.message_control = pglet.Message(visible=False)
-
+        # View content
         self.content = pglet.Stack(
             gap=20,
             controls=[
-                self.election_name_control,
+                self._election_name_control,
                 pglet.Stack(
                     border="1px solid #DDD",
                     border_radius="0",
                     padding=20,
                     bgcolor="#FDFDFD",
                     controls=[
-                        self.voter_control,
+                        self._voter_control,
                     ]
                 ),
                 pglet.Stack(
@@ -52,33 +67,37 @@ class VoteView(View):
                     bgcolor="#FDFDFD",
                     controls=[
                         pglet.Text("Who do you want to vote for President?", size="large"),
-                        self.candidates_control,
+                        self._candidates_choicegroup_control,
                     ]
                 ),
-                self.vote_control,
-                self.message_control,
+                self._vote_button_control,
+                self._message_control,
             ]
         )
 
-    def _candidate_choicegroup(self):
+    def _build_candidate_choicegroup(self):
         cg = pglet.ChoiceGroup()
         for c in self.candidates:
             cg.options.append(pglet.choicegroup.Option(
                 key=c,
                 text=self.candidates[c]["name"]
             ))
-        cg.on_change = self._candidate_choicegroup_changed
+
+        me = self
+
+        def on_change(e):
+            me._current_candidate = e.data
+            me._update_vote_control_disabled()
+
+#        cg.on_change = self._candidate_choicegroup_change
+        cg.on_change = on_change
         return cg
 
-    def _candidate_choicegroup_changed(self, e):
-        self.current_candidate = e.data
-        self.validate()
+    def _candidate_choicegroup_change(self, e):
+        self._current_candidate = e.data
+        self._update_vote_control_disabled()
 
-    def validate(self):
-        self.vote_control.disabled = not (self.current_candidate and self.current_state and self.current_county)
-        self.update()
-
-    def _vote_button(self):
+    def _build_vote_button(self):
         return pglet.Button(
             "Vote",
             title="Cast your vote!",
@@ -89,10 +108,10 @@ class VoteView(View):
             width=100,
         )
 
-    def _voter_control(self):
+    def _build_voter_control(self):
         def county_changed(e):
-            self.current_county = e.data
-            self.validate()
+            self._current_county = e.data
+            self._update_vote_control_disabled()
 
         county_dropdown = pglet.Dropdown(
             width=200,
@@ -101,14 +120,14 @@ class VoteView(View):
         )
 
         def update_counties(state):
-            self.current_state = state
+            self._current_state = state
             county_dropdown.options = [pglet.dropdown.Option(c) for c in self.state_county[state]]
-            # TODO: all of the following are necessary, so encapsulate into custom control
+            # TODO: all of the following are necessary, should encapsulate into custom control
             e = pglet.Event(county_dropdown.uid, "change", data="")
             county_dropdown.value = ""
             county_dropdown.on_change(e)
             county_dropdown.update()
-            self.validate()
+            self._update_vote_control_disabled()
 
         state_dropdown = pglet.Dropdown(
             width=200,
@@ -129,37 +148,27 @@ class VoteView(View):
             ]
         )
 
+    def _update_vote_control_disabled(self):
+        self._vote_button_control.disabled = not (self._current_candidate and self._current_state and self._current_county)
+        self.update()
+
     def _submit_vote(self, _):
         self.clear_message()
-        # TODO: refactor to properties, have adapter query values
-        voter = {
-            "voter_id": self.voter_id,
-            "county": self.current_county,
-            "state": self.current_state,
-        }
-        candidate = {
-            "name": self.current_candidate,
-            "party": self.current_candidate,
-        }
-        data = {
-            "voter": voter,
-            "candidate": candidate,
-        }
         if self.on_submit:
-            self.on_submit(data)
+            self.on_submit()
 
     def message(self, value, kind=""):
-        self.message_control.value = value
-        self.message_control.type = kind
-        self.message_control.visible = True
-        self.message_control.update()
+        self._message_control.value = value
+        self._message_control.type = kind
+        self._message_control.visible = True
+        self._message_control.update()
         self.freeze_form()
 
     def clear_message(self):
-        self.message_control.value = ""
-        self.message_control.type = ""
-        self.message_control.visible = False
-        self.message_control.update()
+        self._message_control.value = ""
+        self._message_control.type = ""
+        self._message_control.visible = False
+        self._message_control.update()
 
     def freeze_form(self):
         # TODO: need a way to unfreeze when reloading page
