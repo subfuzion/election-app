@@ -14,7 +14,6 @@ build:
         dockerfile: Dockerfile
   tagPolicy:
     sha256: {}
-  googleCloudBuild: {}
 deploy:
   kubectl:
     manifests:

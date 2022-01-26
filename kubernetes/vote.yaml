@@ -16,7 +16,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: vote
-          image: gcr.io/voting-app/vote
+          image: gcr.io/election-app/vote
           ports:
             - containerPort: 8080
               name: vote-port
